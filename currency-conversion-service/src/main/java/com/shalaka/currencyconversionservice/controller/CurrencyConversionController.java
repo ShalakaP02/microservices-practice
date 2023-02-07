@@ -3,6 +3,10 @@ package com.shalaka.currencyconversionservice.controller;
 import com.shalaka.currencyconversionservice.model.CurrencyConversion;
 import com.shalaka.currencyconversionservice.model.CurrencyExchange;
 import com.shalaka.currencyconversionservice.proxy.CurrencyExchangeProxy;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +21,9 @@ import java.util.HashMap;
 @RequestMapping("/currency-conversion")
 public class CurrencyConversionController {
 
+    private Logger logger
+            = LoggerFactory.getLogger(CurrencyConversionController.class);
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -24,11 +31,12 @@ public class CurrencyConversionController {
     private CurrencyExchangeProxy proxy;
 
     @GetMapping("/from/{from}/to/{to}/quantity/{quantity}")
+    @CircuitBreaker(name="default", fallbackMethod = "fallbackCalculateCurrencyConversion")
     public CurrencyConversion calculateCurrencyConversion(
             @PathVariable String from,
             @PathVariable String to,
             @PathVariable BigDecimal quantity) {
-
+        logger.info(" calculateCurrencyConversionFeign invoked ");
         HashMap<String, String> uriVariables = new HashMap<>();
         uriVariables.put("from",from);
         uriVariables.put("to",to);
@@ -47,10 +55,12 @@ public class CurrencyConversionController {
     }
 
     @GetMapping("/feign/from/{from}/to/{to}/quantity/{quantity}")
+    @Retry(name="calculate-currency", fallbackMethod = "fallbackCalculateCurrencyConversion")
     public CurrencyConversion calculateCurrencyConversionFeign(
             @PathVariable String from,
             @PathVariable String to,
             @PathVariable BigDecimal quantity) {
+        logger.info("CalculateCurrencyConversionFeign invoked ");
 
         CurrencyExchange currencyExchange = proxy.retrieveExchangeValue(from, to);
 
@@ -60,5 +70,16 @@ public class CurrencyConversionController {
                 quantity.multiply(currencyExchange.getConversionMultiple()),
                 currencyExchange.getEnvironment() + " " + "feign");
 
+    }
+
+    public CurrencyConversion fallbackCalculateCurrencyConversion(
+            @PathVariable String from,
+            @PathVariable String to,
+            @PathVariable BigDecimal quantity, Exception e) {
+        return new CurrencyConversion(0l,
+                from, to, quantity,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                 " Unknown " + "fallback");
     }
 }
