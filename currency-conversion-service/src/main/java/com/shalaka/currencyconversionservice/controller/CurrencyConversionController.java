@@ -36,7 +36,7 @@ public class CurrencyConversionController {
             @PathVariable String from,
             @PathVariable String to,
             @PathVariable BigDecimal quantity) {
-        logger.info(" calculateCurrencyConversionFeign invoked ");
+        logger.info(" calculateCurrencyConversion invoked {} ",from);
         HashMap<String, String> uriVariables = new HashMap<>();
         uriVariables.put("from",from);
         uriVariables.put("to",to);
