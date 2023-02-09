@@ -8,6 +8,7 @@ This example consists of  below features:
 -  **Load Balancing** using spring cloud.
 -  Fault tolerance using **Resilience4j circuit breaker**.
 -  Logging and Routing using **Spring cloud api gateway**.
+- Distributed tracing using **Zipkin**.
 
 # Summary
 Below are api/port details :
