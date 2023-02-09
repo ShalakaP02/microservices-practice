@@ -2,6 +2,13 @@
 Created microservices example for practice, followed from in28minutes tutorial.
 Created two microservices (currency-exchange-service and currency-conversion-service) with eureka server.
 
+# Features
+This example consists of  below features:
+-  Eureka naming server/**Service discovery**.
+-  **Load Balancing** using spring cloud.
+-  Fault tolerance using **Resilience4j circuit breaker**.
+-  Logging and Routing using **Spring cloud api gateway**.
+
 # Summary
 Below are api/port details :
 
