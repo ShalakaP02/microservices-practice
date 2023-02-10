@@ -1,6 +1,6 @@
 # microservices-practice
 Created microservices example for practice, followed from in28minutes tutorial.
-Created two microservices (currency-exchange-service and currency-conversion-service) with eureka server.
+This project consists of 2 microservices - currency-exchange-service and currency-conversion-service, an API-Gateway and a naming/eureka server.
 
 # Features
 This example consists of  below features:
@@ -9,6 +9,23 @@ This example consists of  below features:
 -  Fault tolerance using **Resilience4j circuit breaker**.
 -  Logging and Routing using **Spring cloud api gateway**.
 - Distributed tracing using **Zipkin**.
+
+# Docker
+## Images
+
+- https://hub.docker.com/u/shalakap02
+- Currency Exchange Service
+-- shalakap02/shalakap02/microservices-currency-exchange-service:0.0.1-SNAPSHOT
+- Currency Conversion Service
+-- shalakap02/microservices-currency-conversion-service:0.0.1-SNAPSHOT
+- Eureka
+-- shalakap02/microservices-eureka-naming-server:0.0.1-SNAPSHOT
+- API GATEWAY
+-- shalakap02/microservices-api-gateway:0.0.1-SNAPSHOT
+
+## Run Project
+- Run the project using command :
+**docker-compose up**
 
 # Summary
 Below are api/port details :
