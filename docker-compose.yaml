@@ -1,0 +1,89 @@
+version: '3.9'
+
+services:
+  currency-exchange-service:
+    image: shalakap02/microservices-currency-exchange-service:0.0.1-SNAPSHOT
+    mem_limit: 700m
+    ports:
+      - 8000:8000
+    depends_on:
+      - eureka-naming-server
+      - rabbitmq
+    environment:
+      eureka.client.serviceUrl.defaultZone: http://eureka-naming-server:8761/eureka
+      spring.zipkin.baseUrl: http://zipkin-server:9411/
+      rabbit_uri : amqp://guest:guest@rabbitmq:5672
+      spring_rabbitmq_host: rabbitmq
+      spring_zipkin_sender_type: rabbit
+    networks:
+      - currency-network
+
+  currency-conversion-service:
+    image: shalakap02/microservices-currency-conversion-service:0.0.1-SNAPSHOT
+    mem_limit: 700m
+    ports:
+      - 8100:8100
+    depends_on:
+      - eureka-naming-server
+      - rabbitmq
+    environment:
+      eureka.client.serviceUrl.defaultZone: http://eureka-naming-server:8761/eureka
+      spring.zipkin.baseUrl: http://zipkin-server:9411/
+      rabbit_uri: amqp://guest:guest@rabbitmq:5672
+      spring_rabbitmq_host: rabbitmq
+      spring_zipkin_sender_type: rabbit
+    networks:
+      - currency-network
+
+  api-gateway:
+    image: shalakap02/microservices-api-gateway:0.0.1-SNAPSHOT
+    mem_limit: 700m
+    ports:
+      - 8765:8765
+    depends_on:
+      - eureka-naming-server
+      - rabbitmq
+    environment:
+      eureka.client.serviceUrl.defaultZone: http://eureka-naming-server:8761/eureka
+      spring.zipkin.baseUrl: http://zipkin-server:9411/
+      rabbit_uri: amqp://guest:guest@rabbitmq:5672
+      spring_rabbitmq_host: rabbitmq
+      spring_zipkin_sender_type: rabbit
+    networks:
+      - currency-network
+
+  eureka-naming-server:
+    image: shalakap02/microservices-eureka-naming-server:0.0.1-SNAPSHOT
+    mem_limit: 700m
+    ports:
+      - 8761:8761
+    networks:
+      - currency-network
+
+#docker run -p 9411:9411 openzipkin/zipkin
+
+  zipkin-server:
+    image: openzipkin/zipkin
+    mem_limit: 300m
+    ports:
+      - 9411:9411
+    depends_on:
+      - rabbitmq
+    environment:
+      rabbit_uri: amqp://guest:guest@rabbitmq:5672
+    restart: always
+    networks:
+      - currency-network
+
+  rabbitmq:
+    image: rabbitmq:3.8.12-management
+    mem_limit: 300m
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - currency-network
+
+networks:
+  currency-network:
+
